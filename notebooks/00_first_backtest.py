@@ -20,15 +20,15 @@ from generation.ema_cross import EMACross
 from generation.ema_cross import EMACrossConfig
 
 
-def generate_synthetic_quotes(instrument, num_ticks=5000, start_price=0.6500, seed=42):
+def generate_synthetic_quotes(instrument, num_ticks=5000, start_price=150.00, seed=42):
     rng = np.random.default_rng(seed)
-    prices = start_price + np.cumsum(rng.normal(0, 0.00005, num_ticks))
+    prices = start_price + np.cumsum(rng.normal(0, 0.01, num_ticks))
     timestamps = pd.date_range("2024-01-01", periods=num_ticks, freq="s", tz="UTC")
 
     quotes = []
     for ts, mid in zip(timestamps, prices):
-        bid = mid - 0.0001
-        ask = mid + 0.0001
+        bid = mid - 0.01
+        ask = mid + 0.01
         quotes.append(
             QuoteTick(
                 instrument_id=instrument.id,
@@ -62,16 +62,16 @@ if __name__ == "__main__":
         ),
     )
 
-    AUDUSD_SIM = TestInstrumentProvider.default_fx_ccy("AUD/USD", SIM)
-    engine.add_instrument(AUDUSD_SIM)
+    USDJPY_SIM = TestInstrumentProvider.default_fx_ccy("USD/JPY", SIM)
+    engine.add_instrument(USDJPY_SIM)
 
-    ticks = generate_synthetic_quotes(AUDUSD_SIM, num_ticks=5000)
+    ticks = generate_synthetic_quotes(USDJPY_SIM, num_ticks=5000, start_price=150.00)
     engine.add_data(ticks)
 
     strategy = EMACross(
         EMACrossConfig(
-            instrument_id=AUDUSD_SIM.id,
-            bar_type=BarType.from_str("AUD/USD.SIM-100-TICK-MID-INTERNAL"),
+            instrument_id=USDJPY_SIM.id,
+            bar_type=BarType.from_str("USD/JPY.SIM-100-TICK-MID-INTERNAL"),
             trade_size=Decimal(1_000_000),
             fast_ema_period=10,
             slow_ema_period=20,
@@ -82,9 +82,9 @@ if __name__ == "__main__":
     engine.run()
 
     with pd.option_context(
-            "display.max_rows", 100,
-            "display.max_columns", None,
-            "display.width", 300,
+        "display.max_rows", 100,
+        "display.max_columns", None,
+        "display.width", 300,
     ):
         print(engine.trader.generate_account_report(SIM))
         print(engine.trader.generate_order_fills_report())

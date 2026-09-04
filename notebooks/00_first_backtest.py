@@ -90,5 +90,8 @@ if __name__ == "__main__":
         print(engine.trader.generate_order_fills_report())
         print(engine.trader.generate_positions_report())
 
+        fills_df = engine.trader.generate_order_fills_report()
+        fills_df.reset_index().to_csv("../data/raw/usdjpy_frontoffice_blotter_raw.csv", index=False)
+
     engine.reset()
     engine.dispose()

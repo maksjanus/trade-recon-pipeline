@@ -65,7 +65,7 @@ if __name__ == "__main__":
     USDJPY_SIM = TestInstrumentProvider.default_fx_ccy("USD/JPY", SIM)
     engine.add_instrument(USDJPY_SIM)
 
-    ticks = generate_synthetic_quotes(USDJPY_SIM, num_ticks=5000, start_price=150.00)
+    ticks = generate_synthetic_quotes(USDJPY_SIM, num_ticks=50000, start_price=150.00)
     engine.add_data(ticks)
 
     strategy = EMACross(
